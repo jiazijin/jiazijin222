@@ -1,0 +1,32 @@
+//假设晶振12MHZ，P1控制8个LED低电平亮
+#include "reg51.h"
+unsigned int YSJS=0;
+signed char LED=0XFF;
+void main(void)
+{
+    TMOD |= 0X10;                            //定时器1工作于方式1,16位定时器
+    TH1 = 0XFE;                              //定时器1定时时间=500uS
+    TL1 = 0X0C;
+    ET1 = 1;                                 //使能定时器1中断
+    TR1 =1;
+    EA =1;                                   //开总中断
+
+    while(1)
+    {
+    }
+}
+
+void TIMER1(void) interrupt 3                //定时器1中断函数使用默认寄存器组
+{
+    TH1 = 0XFE;                              //定时器1定时时间=500us
+    TL1 = 0X0C;
+
+    YSJS++;
+    if(YSJS==1000)                           //500uS*1000=500000us=0.5s,可调整
+    {
+    P1 = LED;
+    LED=LED<<1
+    if(LED==0X00)LED=0XFF;
+    YSJS = 0
+    }
+}
